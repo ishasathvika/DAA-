@@ -1,0 +1,28 @@
+#include<stdio.h>
+
+int main(){
+    int n,i;
+    float w[10],p[10],r[10],cap,profit=0;
+
+    scanf("%d",&n);
+
+    for(i=0;i<n;i++){
+        scanf("%f%f",&p[i],&w[i]);
+        r[i]=p[i]/w[i];
+    }
+
+    scanf("%f",&cap);
+
+    for(i=0;i<n;i++){
+        if(cap>=w[i]){
+            profit+=p[i];
+            cap-=w[i];
+        }
+        else{
+            profit+=r[i]*cap;
+            break;
+        }
+    }
+
+    printf("Max profit=%f",profit);
+}
