@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <limits.h>
+
+#define MAXN 20
+
+int n;
+int graph[MAXN][MAXN];
+int dp[1 << MAXN][MAXN];
+
+int min(int a, int b) {
+    return (a < b) ? a : b;
+}
+
+// DP function
+int tsp(int mask, int pos) {
+    // If all cities visited, return to start
+    if (mask == (1 << n) - 1) {
+        if (graph[pos][0] != 0)
+            return graph[pos][0];
+        else
+            return INT_MAX;
+    }
+
+    // If already computed
+    if (dp[mask][pos] != -1)
+        return dp[mask][pos];
+
+    int ans = INT_MAX;
+
+    for (int city = 0; city < n; city++) {
+        if ((mask & (1 << city)) == 0 && graph[pos][city] != 0) {
+            int newAns = graph[pos][city] +
+                         tsp(mask | (1 << city), city);
+
+            ans = min(ans, newAns);
+        }
+    }
+
+    return dp[mask][pos] = ans;
+}
+
+int main() {
+    printf("Enter number of cities: ");
+    scanf("%d", &n);
+
+    printf("Enter the adjacency matrix:\n");
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            scanf("%d", &graph[i][j]);
+        }
+    }
+
+    // Initialize dp table
+    for (int i = 0; i < (1 << n); i++) {
+        for (int j = 0; j < n; j++) {
+            dp[i][j] = -1;
+        }
+    }
+
+    int result = tsp(1, 0);  // start from city 0
+
+    printf("Minimum travelling cost: %d\n", result);
+
+    return 0;
+}
