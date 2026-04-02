@@ -1,34 +1,68 @@
-import sys
+#include <stdio.h>
+#include <limits.h>
 
-n = int(input("Enter number of vertices: "))
-cost = []
+#define MAX 100  // Maximum number of vertices
 
-for i in range(n):
-    row = list(map(int, input().split()))
-    cost.append(row)
+// Function to find the vertex with minimum distance value
+int minDistance(int dist[], int sptSet[], int n) {
+    int min = INT_MAX, min_index;
+    for (int v = 0; v < n; v++)
+        if (!sptSet[v] && dist[v] <= min) {
+            min = dist[v];
+            min_index = v;
+        }
+    return min_index;
+}
 
-dist = [sys.maxsize]*n
-visited = [False]*n
+// Function to print the distance array
+void printSolution(int dist[], int n) {
+    printf("Vertex \t Distance from Source\n");
+    for (int i = 0; i < n; i++)
+        printf("%d \t %d\n", i, dist[i]);
+}
 
-source = 0
-dist[source] = 0
+// Dijkstra's algorithm
+void dijkstra(int graph[MAX][MAX], int src, int n) {
+    int dist[MAX];
+    int sptSet[MAX];
 
-for _ in range(n):
-    min = sys.maxsize
-    u = -1
+    for (int i = 0; i < n; i++) {
+        dist[i] = INT_MAX;
+        sptSet[i] = 0;
+    }
 
-    for i in range(n):
-        if not visited[i] and dist[i] < min:
-            min = dist[i]
-            u = i
+    dist[src] = 0;
 
-    visited[u] = True
+    for (int count = 0; count < n - 1; count++) {
+        int u = minDistance(dist, sptSet, n);
+        sptSet[u] = 1;
 
-    for v in range(n):
-        if cost[u][v] and not visited[v]:
-            if dist[u] + cost[u][v] < dist[v]:
-                dist[v] = dist[u] + cost[u][v]
+        for (int v = 0; v < n; v++)
+            if (!sptSet[v] && graph[u][v] && dist[u] != INT_MAX
+                && dist[u] + graph[u][v] < dist[v])
+                dist[v] = dist[u] + graph[u][v];
+    }
 
-print("Shortest distances:")
-for i in range(n):
-    print(source,"to",i,"=",dist[i])
+    printSolution(dist, n);
+}
+
+int main() {
+    int n, src;
+
+    printf("Enter number of vertices: ");
+    scanf("%d", &n);
+
+    int graph[MAX][MAX];
+
+    printf("Enter adjacency matrix (0 if no edge):\n");
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            scanf("%d", &graph[i][j]);
+
+    printf("Enter source vertex (0 to %d): ", n-1);
+    scanf("%d", &src);
+
+    dijkstra(graph, src, n);
+
+    return 0;
+}
